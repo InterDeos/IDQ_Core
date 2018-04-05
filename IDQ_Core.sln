@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDQ_Core", "IDQ_Core\IDQ_Core.csproj", "{FD405F50-C0DB-4022-8503-59AC831C6713}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDQ_Core_0", "IDQ_Core_0\IDQ_Core_0.csproj", "{8C8A61B3-5236-4891-9C78-BF50BD80D9CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD405F50-C0DB-4022-8503-59AC831C6713}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD405F50-C0DB-4022-8503-59AC831C6713}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD405F50-C0DB-4022-8503-59AC831C6713}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD405F50-C0DB-4022-8503-59AC831C6713}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C8A61B3-5236-4891-9C78-BF50BD80D9CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C8A61B3-5236-4891-9C78-BF50BD80D9CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C8A61B3-5236-4891-9C78-BF50BD80D9CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C8A61B3-5236-4891-9C78-BF50BD80D9CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F702ABE-3F14-4C7D-B576-1CCF7E628489}
+	EndGlobalSection
+EndGlobal

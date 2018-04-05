@@ -1,0 +1,9 @@
+F:\IDQuods\IDQ_Core\IDQ_Core_0\bin\Debug\IDQ_Core_0.dll
+F:\IDQuods\IDQ_Core\IDQ_Core_0\bin\Debug\IDQ_Core_0.pdb
+F:\IDQuods\IDQ_Core\IDQ_Core_0\bin\Debug\WebDriver.dll
+F:\IDQuods\IDQ_Core\IDQ_Core_0\bin\Debug\WebDriver.Support.dll
+F:\IDQuods\IDQ_Core\IDQ_Core_0\obj\Debug\IDQ_Core_0.csprojResolveAssemblyReference.cache
+F:\IDQuods\IDQ_Core\IDQ_Core_0\obj\Debug\IDQ_Core_0.csproj.CoreCompileInputs.cache
+F:\IDQuods\IDQ_Core\IDQ_Core_0\obj\Debug\IDQ_Core_0.csproj.CopyComplete
+F:\IDQuods\IDQ_Core\IDQ_Core_0\obj\Debug\IDQ_Core_0.dll
+F:\IDQuods\IDQ_Core\IDQ_Core_0\obj\Debug\IDQ_Core_0.pdb
