@@ -52,10 +52,13 @@
     <Compile Include="Class\JSONSerializer.cs" />
     <Compile Include="Class\MessageService\WinFormMessageService.cs" />
     <Compile Include="Class\WebDriverManager.cs" />
+    <Compile Include="Interface\IBot.cs" />
     <Compile Include="Interface\IMessageService.cs" />
     <Compile Include="Interface\IWebDriverManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Struct\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

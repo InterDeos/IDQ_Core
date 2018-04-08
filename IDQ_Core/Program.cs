@@ -11,26 +11,29 @@ namespace IDQ_Core
     {
         static void Main(string[] args)
         {
-            var web = new WebDriverManager();
-            web.Action += Web_Action;
-            web.ActionError += Web_ActionError;
-            web.Create().GoToUrl("http://www.google.com");
-            for (int i = 0; i < 100; i++)
-            {
-                web.GoToUrl("http://www.whoer.net").Sleep(300, 1000).GoToUrl("http://www.planetromeo.net").Sleep(300, 1000).GoToUrl("http://www.google.com");
-            }
-            
+            var log = new ConsoleMessageService();
+
+
             Console.ReadKey();
         }
 
-        private static void Web_ActionError(string obj)
+        private static void Bot_ActionErrorEvent(string obj)
         {
             WinFormMessageService.ShowError(obj);
         }
 
-        private static void Web_Action(string obj)
+        private static void Bot_ActionEvent(string obj)
         {
             new ConsoleMessageService().ShowMesssage(obj);
+            if (obj == "Stop") { new ConsoleMessageService().ShowExclamation("Save"); }
+        }
+
+        private static void TestFor(WebDriverManager web)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                web.GoToUrl("http://www.whoer.net").Sleep(300, 1000).GoToUrl("http://www.planetromeo.net").Sleep(300, 1000).GoToUrl("http://www.google.com");
+            }
         }
     }
 }

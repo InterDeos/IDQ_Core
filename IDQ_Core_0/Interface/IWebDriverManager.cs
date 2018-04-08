@@ -16,8 +16,10 @@ namespace IDQ_Core_0.Interface
         string PageSource { get; }
         string URL { get; }
         IOptions DriverOptions { get; }
+        ITargetLocator SwitchTo { get; }
         int TimeOutLikeSeconds { get; set; }
         bool Work { get; }
+        bool Stop { get; set; }
 
         event Action<string> ActionError;
         event Action<string> Action;
@@ -41,6 +43,8 @@ namespace IDQ_Core_0.Interface
         IWebDriverManager Sleep(int timeLikeMS);
         IWebDriverManager Sleep(int minTimeLikeMS, int maxTimeLikeMS);
         IWebDriverManager SwitchFrame(string name);
+        IWebDriverManager SwitcWindow(string window);
         IWebDriverManager SwitchToDefault();
+        List<string> GetWindows();
     }
 }

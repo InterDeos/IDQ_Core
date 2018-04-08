@@ -1,6 +1,7 @@
 ﻿using IDQ_Core_0.Interface;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,114 @@ namespace IDQ_Core_0.Class
         {
             ActionError?.Invoke(message);
         }
+        private void StopAction()
+        {
+            Message("Stop");
+            MessageError("Stop");
+            Stop = true;
+            Quit();
+            
+        }
+        private void IfTryCatch(Action action)
+        {
+            if (!Stop)
+            {
+                if (Work)
+                {
+                    try
+                    {
+                        action();
+                    }
+                    catch (Exception e)
+                    {
+                        switch (e.GetType().ToString())
+                        {
+                            case "OpenQA.Selenium.DriverServiceNotFoundException":
+                                {
+                                    MessageError("geckodriver for FireFox Not Found");
+                                    break;
+                                }
+                            case "OpenQA.Selenium.NoSuchElementException":
+                                {
+                                    MessageError(string.Format("Element Not Found | TimeOut = {0} seconds", TimeOutLikeSeconds));
+                                    break;
+                                }
+                            case "OpenQA.Selenium.WebDriverException":
+                                {
+                                    StopAction();
+                                    MessageError(e.ToString());
+                                    MessageError(e.Message);
+                                    break;
+                                }
+                            case "System.NullReferenceException":
+                                {
+                                    StopAction();
+                                    MessageError(e.ToString());
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageError(e.GetType().ToString());
+                                    MessageError(e.Message);
+                                    break;
+                                }
+                        }
+                    }
+                }
+                else { MessageError("Driver was not created!"); }
+            }
+        }
+        private bool IfTryCatch(Func<bool> func)
+        {
+            if (!Stop)
+            {
+                if (Work)
+                {
+                    try
+                    {
+                        return func();
+                    }
+                    catch (Exception e)
+                    {
+                        switch (e.GetType().ToString())
+                        {
+                            case "OpenQA.Selenium.DriverServiceNotFoundException":
+                                {
+                                    MessageError("geckodriver for FireFox Not Found");
+                                    break;
+                                }
+                            case "OpenQA.Selenium.NoSuchElementException":
+                                {
+                                    MessageError(string.Format("Element Not Found | TimeOut = {0} seconds", TimeOutLikeSeconds));
+                                    break;
+                                }
+                            case "OpenQA.Selenium.WebDriverException":
+                                {
+                                    StopAction();
+                                    MessageError(e.ToString());
+                                    MessageError(e.Message);
+                                    break;
+                                }
+                            case "System.NullReferenceException":
+                                {
+                                    StopAction();
+                                    MessageError(e.ToString());
+                                    break;
+                                }
+                            default:
+                                {
+                                    MessageError(e.GetType().ToString());
+                                    MessageError(e.Message);
+                                    break;
+                                }
+                        }
+                        return false;
+                    }
+                }
+                else { MessageError("Driver was not created!"); return false; }
+            }
+            else { return false; }
+        }
 
 
         public IWebDriver Driver
@@ -70,10 +179,12 @@ namespace IDQ_Core_0.Class
                 {
                     _driver = value;
                     Work = true;
+                    Stop = false;
                 }
                 else
                 {
                     Work = false;
+                    Stop = false;
                 }
             }
         }
@@ -101,6 +212,7 @@ namespace IDQ_Core_0.Class
         public string URL { get { return Work ? _driver.Url : ""; } }
 
         public bool Work { get; private set; }
+        public bool Stop { get; set; }
 
         public WebDriverManager() : this(false) { }
         public WebDriverManager(bool onCreateStart) : this(onCreateStart, Selector.CssSelector) { }
@@ -126,39 +238,19 @@ namespace IDQ_Core_0.Class
 
         public IWebDriverManager Create()
         {
-            if(!Work)
+            if (!Work)
             {
-                try
-                {
-                    Message("Create Driver");
-                    Driver = GetDriver();
-                    Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
-                }catch(Exception e)
-                {
-                    switch (e.GetType().ToString())
-                    {
-                        case "OpenQA.Selenium.DriverServiceNotFoundException":
-                            {
-                                MessageError("geckodriver for FireFox Not Found");
-                                break;
-                            }
-                        default:
-                            {
-                                MessageError(e.GetType().ToString());
-                                MessageError(e.Message);
-                                break;
-                            }
-                    }
-                }
-            }
-            else { MessageError("Driver was created!"); }
+                Message("Create Driver");
+                Driver = GetDriver();
+                Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
+            }else { MessageError("Driver was created!"); }
             return this;
         }
         public IWebDriverManager Close()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                if(Driver.WindowHandles.Count>1)
+                if (Driver.WindowHandles.Count > 1)
                 {
                     Message("Close Window");
                     Driver.Close();
@@ -169,30 +261,30 @@ namespace IDQ_Core_0.Class
                     Driver.Close();
                     Driver.Dispose();
                     Driver = null;
+                    Stop = false;
                 }
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
         public IWebDriverManager Quit()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
                 Message("Driver Quit");
                 Driver.Quit();
                 Driver.Dispose();
                 Driver = null;
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
 
         public bool Connection()
         {
-            if(Work)
+            return IfTryCatch(()=>
             {
                 if (IsElementPresent("p#errorShortDescText"))
                 {
+                    StopAction();
                     MessageError("Could not connect!");
                     return false;
                 }
@@ -200,140 +292,144 @@ namespace IDQ_Core_0.Class
                 {
                     return true;
                 }
-            }
-            else { CreatedMessageError(); return false; }
+            });
         }
         public IWebDriverManager GoToUrl(string url)
         {
-            if (Work)
+            IfTryCatch(()=>
             {
                 Message(string.Format("Go to URL: {0}", url));
                 Driver.Navigate().GoToUrl(url);
                 Connection();
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
         public IWebDriverManager Back()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
                 Message("Back command");
                 Driver.Navigate().Back();
                 Connection();
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
         public IWebDriverManager Refresh()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
                 Message("Refresh command");
                 Driver.Navigate().Refresh();
                 Connection();
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
         public IWebDriverManager Forward()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
                 Message("Forward command");
                 Driver.Navigate().Forward();
                 Connection();
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
 
         public bool IsElementPresent(string locator)
         {
-            if (Work)
+            return IfTryCatch(()=>
             {
-                try
+                if (!Stop)
                 {
-                    Message(string.Format("IS ElementPresent?"));
-                    Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(0);
-                    Driver.FindElement(byLocator(locator));
-                    Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
-                    Message(string.Format("IS ElementPresent = TRUE"));
-                    return true;
-
-                }
-                catch (Exception e)
-                {
-                    switch (e.GetType().ToString())
+                    if (Work)
                     {
-                        case "OpenQA.Selenium.NoSuchElementException":
+                        try
+                        {
+                            Message(string.Format("IS ElementPresent? {0}", locator));
+                            Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(0);
+                            Driver.FindElement(byLocator(locator));
+                            Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
+                            Message(string.Format("IS ElementPresent = TRUE"));
+                            return true;
+                        }
+                        catch (Exception e)
+                        {
+                            switch (e.GetType().ToString())
                             {
-                                Message(string.Format("IS ElementPresent = FALSE"));
-                                break;
+                                case "OpenQA.Selenium.DriverServiceNotFoundException":
+                                    {
+                                        MessageError("geckodriver for FireFox Not Found");
+                                        break;
+                                    }
+                                case "OpenQA.Selenium.NoSuchElementException":
+                                    {
+                                        Message(string.Format("IS ElementPresent = FALSE"));
+                                        break;
+                                    }
+                                case "OpenQA.Selenium.WebDriverException":
+                                    {
+                                        StopAction();
+                                        MessageError(e.ToString());
+                                        MessageError(e.Message);
+                                        break;
+                                    }
+                                case "System.NullReferenceException":
+                                    {
+                                        StopAction();
+                                        MessageError(e.ToString());
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        MessageError(e.GetType().ToString());
+                                        MessageError(e.Message);
+                                        break;
+                                    }
                             }
-                        default:
-                            {
-                                MessageError(e.GetType().ToString());
-                                MessageError(e.Message);
-                                break;
-                            }
+                            return false;
+                        }
                     }
-                    
-                    Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
-                    return false;
+                    else { MessageError("Driver was not created!"); return false; }
                 }
-            }
-            else { CreatedMessageError(); return false; }
+                else { return false; }
+            });
         }
 
         public IWebDriverManager FindElement(string locator)
         {
-            if (Work)
+            IfTryCatch(() =>
             {
-                try
-                {
-                    Message(string.Format("Find Element: {0}", locator));
-                    WebElement = Driver.FindElement(byLocator(locator));
-                }
-                catch (Exception e)
-                {
-                    MessageError(e.GetType().ToString());
-                    MessageError(e.Message);
-                }
-            }
-            else { CreatedMessageError(); }
+                Message(string.Format("Find Element: {0}", locator));
+                Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
+                WebElement = Driver.FindElement(byLocator(locator));
+            });
+
             return this;
         }
         public IWebDriverManager FindElements(string locator)
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                try
-                {
-                    Message(string.Format("Find Elements: {0}", locator));
-                    WebElements = Driver.FindElements(byLocator(locator)).ToList();
-                }
-                catch (Exception e)
-                {
-                    MessageError(e.GetType().ToString());
-                    MessageError(e.Message);
-                }
-            }
-            else { CreatedMessageError(); }
+                Message(string.Format("Find Elements: {0}", locator));
+                Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
+                WebElements = Driver.FindElements(byLocator(locator)).ToList();
+            });
             return this;
         }
         public IWebElement FindElementObj(string locator)
         {
             if (Work)
             {
-                throw new NotImplementedException();
                 try
                 {
-                    Message(string.Format(""));
+                    Message(string.Format("Find Element as IWebElement: {0}", locator));
+                    Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
+                    return Driver.FindElement(byLocator(locator));
                 }
                 catch (Exception e)
                 {
                     MessageError(e.Message);
+                    return null;
                 }
             }
             else { CreatedMessageError(); return null; }
@@ -342,14 +438,16 @@ namespace IDQ_Core_0.Class
         {
             if (Work)
             {
-                throw new NotImplementedException();
                 try
                 {
-                    Message(string.Format(""));
+                    Message(string.Format("Find Element as IWebElement: {0}", locator));
+                    Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(TimeOutLikeSeconds);
+                    return Driver.FindElements(byLocator(locator));
                 }
                 catch (Exception e)
                 {
                     MessageError(e.Message);
+                    return null;
                 }
             }
             else { CreatedMessageError(); return null; }
@@ -357,110 +455,89 @@ namespace IDQ_Core_0.Class
 
         public IWebDriverManager Click()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                try
-                {
-                    Message(string.Format(""));
-                }
-                catch (Exception e)
-                {
-                    MessageError(e.Message);
-                }
-            }
-            else { CreatedMessageError(); }
+                Message(string.Format("Click"));
+                WebElement.Click();
+            });
             return this;
         }
         public IWebDriverManager SendKeys(string keys)
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                try
-                {
-                    Message(string.Format(""));
-                }
-                catch (Exception e)
-                {
-                    MessageError(e.Message);
-                }
-            }
-            else { CreatedMessageError(); }
+                Message(string.Format("Send: {0}", keys));
+                WebElement.SendKeys(keys);
+            });
             return this;
         }
         public IWebDriverManager Sleep(int timeLikeMS)
         {
-            if (Work)
+            IfTryCatch(()=>
             {
                 Message(string.Format("Sleep {0} milliseconds", timeLikeMS));
                 Thread.Sleep(timeLikeMS);
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
         public IWebDriverManager Sleep(int minTimeLikeMS, int maxTimeLikeMS)
         {
-            if (Work)
-            {
-                Message(string.Format("Sleep From {0} to {1} milliseconds", minTimeLikeMS, maxTimeLikeMS));
-                return Sleep(new Random().Next(minTimeLikeMS, maxTimeLikeMS));
-            }
-            else { CreatedMessageError(); }
-            return this;
+            Message(string.Format("Sleep From {0} to {1} milliseconds", minTimeLikeMS, maxTimeLikeMS));
+            return Sleep(new Random().Next(minTimeLikeMS, maxTimeLikeMS));
         }
+
         public IWebDriverManager SelectOption(string locator, string value)
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                try
-                {
-                    Message(string.Format(""));
-                }
-                catch (Exception e)
-                {
-                    MessageError(e.Message);
-                }
-            }
-            else { CreatedMessageError(); }
+                Message(string.Format("Select {0} in {1}", value, locator));
+                new SelectElement(Driver.FindElement(byLocator(locator))).SelectByValue(value);
+            });
             return this;
         }
         public IWebDriverManager SwitchFrame(string name)
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                try
+                Message(string.Format("Switch Frame {0}", name));
+                Frames = Driver.FindElements(byLocator("frame")).ToList();
+                IWebElement element = Frames.Find((x) => x.GetAttribute("name") == name);
+                if (element != null)
                 {
-                    Message(string.Format(""));
+                    SwitchTo.Frame(element);
                 }
-                catch (Exception e)
+                else
                 {
-                    MessageError(e.Message);
+                    MessageError("Frame not found");
                 }
-            }
-            else { CreatedMessageError(); }
+            });
             return this;
         }
         public IWebDriverManager SwitchToDefault()
         {
-            if (Work)
+            IfTryCatch(()=>
             {
-                try
-                {
-                    Message(string.Format(""));
-                }
-                catch (Exception e)
-                {
-                    MessageError(e.Message);
-                }
-            }
-            else { CreatedMessageError(); }
+                Driver.SwitchTo().DefaultContent();
+            });
             return this;
         }
+        public List<string> GetWindows()
+        {
+            return Driver.WindowHandles.ToList();
+        }
+        public ITargetLocator SwitchTo
+        {
+            get => Work ? Driver.SwitchTo() : null;
+        }
 
-
-
-
-
-
-
+        public IWebDriverManager SwitcWindow(string window)
+        {
+            IfTryCatch(()=>
+            {
+                Message(string.Format("Switch window {0}", window));
+                SwitchTo.Window(window);
+            });
+            return this;
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace IDQ_Core_0.Class.MessageService
         public ConsoleColor ErrorColor { get => _errorColor; set => _errorColor = value; }
         public ConsoleColor DefaultBackgroundColor { get => _defaultBackgroundColor; set => _defaultBackgroundColor = value; }
 
-        public ConsoleMessageService() : this(ConsoleColor.Gray, ConsoleColor.Black, ConsoleColor.Cyan, ConsoleColor.DarkYellow, ConsoleColor.DarkRed) { }
+        public ConsoleMessageService() : this(ConsoleColor.Gray, ConsoleColor.Black, ConsoleColor.Cyan, ConsoleColor.Yellow, ConsoleColor.Red) { }
         public ConsoleMessageService(ConsoleColor defaultColor, ConsoleColor background, ConsoleColor message, ConsoleColor exclamation, ConsoleColor error)
         {
             DefaultColor = defaultColor;
@@ -201,18 +201,18 @@ namespace IDQ_Core_0.Class.MessageService
         {
             ColorMessage("\n-------------------------------------------------------------\n", DefaultColor, DefaultBackgroundColor);
             GreenWrite(string.Format("[{0}]", DateTime.Now));
-            ColorMessage("\n{Message}\n\n", ErrorColor, DefaultBackgroundColor);
+            ColorMessage("\n{Error}\n\n", ErrorColor, DefaultBackgroundColor);
             ColorMessage(error, ConsoleColor.White, DefaultBackgroundColor);
-            ColorMessage("\n\n{Message}", ErrorColor, DefaultBackgroundColor);
+            ColorMessage("\n\n{Error}", ErrorColor, DefaultBackgroundColor);
             ColorMessage("\n-------------------------------------------------------------\n", DefaultColor, DefaultBackgroundColor);
         }
         public void ShowExclamation(string exclamation)
         {
             ColorMessage("\n-------------------------------------------------------------\n", DefaultColor, DefaultBackgroundColor);
             GreenWrite(string.Format("[{0}]", DateTime.Now));
-            ColorMessage("\n{Message}\n\n", ExclamationColor, DefaultBackgroundColor);
+            ColorMessage("\n{Exclamation}\n\n", ExclamationColor, DefaultBackgroundColor);
             ColorMessage(exclamation, ConsoleColor.White, DefaultBackgroundColor);
-            ColorMessage("\n\n{Message}", ExclamationColor, DefaultBackgroundColor);
+            ColorMessage("\n\n{Exclamation}", ExclamationColor, DefaultBackgroundColor);
             ColorMessage("\n-------------------------------------------------------------\n", DefaultColor, DefaultBackgroundColor);
         }
         public void ShowMesssage(string message)
